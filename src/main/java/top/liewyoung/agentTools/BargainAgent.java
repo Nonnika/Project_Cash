@@ -23,6 +23,7 @@ public class BargainAgent implements AgentDo {
     private int currentRound = 0;
     private final int maxRounds = 3;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final String model;
 
     // 系统提示词
     private static final String SYSTEM_PROMPT = """
@@ -54,11 +55,12 @@ public class BargainAgent implements AgentDo {
         String model = ConfigLoaderKt.getValue("model");
 
         // 使用默认值
-        if (apiUrl == null)
+        if (apiUrl == null || apiUrl.isEmpty())
             apiUrl = "https://api.deepseek.com/chat/completions";
-        if (model == null)
+        if (model == null || model.isEmpty())
             model = "deepseek-chat";
 
+        this.model = model;
         this.requests = new Requests(apiUrl, apiKey);
         this.chatRequest = new ChatRequest(model, false);
         this.chatRequest.addMessage(new Message(Role.SYSTEM, SYSTEM_PROMPT));
@@ -149,10 +151,6 @@ public class BargainAgent implements AgentDo {
      * 重置对话（开始新的砍价）
      */
     public void reset() {
-        String model = ConfigLoaderKt.getValue("model");
-        if (model == null)
-            model = "deepseek-chat";
-
         this.chatRequest = new ChatRequest(model, false);
         this.chatRequest.addMessage(new Message(Role.SYSTEM, SYSTEM_PROMPT));
         this.agreed = false;

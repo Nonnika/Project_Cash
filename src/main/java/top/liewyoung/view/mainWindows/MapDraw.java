@@ -60,6 +60,28 @@ public class MapDraw extends JPanel {
     
     /** 背景颜色 */
     private static final Color BACKGROUND_COLOR = new Color(253, 253, 245);
+
+    // ==================== 预缓存颜色常量（避免每次重绘时重复创建对象） ====================
+
+    /** 方块颜色：开始 */
+    private static final Color TILE_COLOR_START = new Color(46, 204, 113);
+    /** 方块颜色：机会 */
+    private static final Color TILE_COLOR_OPPORTUNITY = new Color(192, 202, 51);
+    /** 方块颜色：市场 */
+    private static final Color TILE_COLOR_MARKET = new Color(76, 175, 80);
+    /** 方块颜色：命运 */
+    private static final Color TILE_COLOR_FATE = new Color(0, 137, 123);
+    /** 方块颜色：银行 */
+    private static final Color TILE_COLOR_BANK = new Color(27, 94, 32);
+    /** 方块颜色：默认（游戏） */
+    private static final Color TILE_COLOR_DEFAULT = new Color(105, 240, 174);
+
+    /** 方块文字字体（预缓存，避免每帧重复创建） */
+    private static final Font TILE_FONT = new Font(FONT_NAME, Font.BOLD, FONT_SIZE);
+
+    /** 背景网格线颜色（预缓存，避免每帧重复创建） */
+    private static final Color BACKGROUND_GRID_COLOR =
+            new Color(MaterialPalette.MOSS.surfaceVariant().getRGB() & 0x40FFFFFF, true);
     
     /** 随机类型的起始索引（不包含） */
     private static final int RANDOM_TYPE_START_INDEX = 1;
@@ -478,7 +500,7 @@ public class MapDraw extends JPanel {
      */
     private void drawBackground(Graphics2D g2d) {
         // 绘制柔和的网格线（装饰）
-        g2d.setColor(new Color(MaterialPalette.MOSS.surfaceVariant().getRGB() & 0x40FFFFFF, true));
+        g2d.setColor(BACKGROUND_GRID_COLOR);
         int gridSize = 40;
         for (int x = 0; x < getWidth(); x += gridSize) {
             g2d.drawLine(x, 0, x, getHeight());
@@ -680,6 +702,7 @@ public class MapDraw extends JPanel {
      */
     private void drawTileText(Graphics2D g2d, Tile tile, int x, int y, MaterialPalette palette) {
         String text = getText(tile.type);
+        g2d.setFont(TILE_FONT);
         FontMetrics fm = g2d.getFontMetrics();
         int textWidth = fm.stringWidth(text);
         int textHeight = fm.getAscent();
@@ -694,7 +717,6 @@ public class MapDraw extends JPanel {
             g2d.setColor(palette.surface());
         }
         
-        g2d.setFont(new Font(FONT_NAME, Font.BOLD, FONT_SIZE));
         g2d.drawString(text, textX, textY);
     }
     
@@ -725,12 +747,12 @@ public class MapDraw extends JPanel {
      */
     private Color getColor(TitlesTypes type) {
         return switch (type) {
-            case TitlesTypes.START -> new Color(46, 204, 113);        // 翠绿色
-            case TitlesTypes.OPPORTUNITY -> new Color(192, 202, 51);  // 黄绿色
-            case TitlesTypes.MARKET -> new Color(76, 175, 80);        // 绿色
-            case TitlesTypes.FATE -> new Color(0, 137, 123);          // 青色
-            case TitlesTypes.BANK -> new Color(27, 94, 32);           // 深绿色
-            default -> new Color(105, 240, 174);                       // 浅绿色
+            case TitlesTypes.START -> TILE_COLOR_START;
+            case TitlesTypes.OPPORTUNITY -> TILE_COLOR_OPPORTUNITY;
+            case TitlesTypes.MARKET -> TILE_COLOR_MARKET;
+            case TitlesTypes.FATE -> TILE_COLOR_FATE;
+            case TitlesTypes.BANK -> TILE_COLOR_BANK;
+            default -> TILE_COLOR_DEFAULT;
         };
     }
     
